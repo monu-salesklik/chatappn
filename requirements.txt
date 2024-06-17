@@ -6,4 +6,5 @@ chromadb
 faiss-cpu
 langchain_google_genai
 langchain-community
+tenacity
 fastapi[all]
