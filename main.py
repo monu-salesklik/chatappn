@@ -14,7 +14,7 @@ from pydantic import BaseModel
 
 load_dotenv()
 os.getenv("GOOGLE_API_KEY")
-genai.configure(api_key="AIzaSyB6kfcGhxQ64by7KEH5sOOOkGxVowoV3xA")
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 
 app = FastAPI()
@@ -49,7 +49,7 @@ def get_conversational_chain():
 
     prompt_template = """
     Answer the question as detailed as possible from the provided context, make sure to provide all the details, if the answer is not in
-    provided context just say, "answer is not available in the context", don't provide the wrong answer\n\n
+    provided context just try to provide the answer from yourself if you can\n\n
     Context:\n {context}?\n
     Question: \n{question}\n
 
