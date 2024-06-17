@@ -6,5 +6,5 @@ chromadb
 faiss-cpu
 langchain_google_genai
 langchain-community
-tenacity=8.3.0
+tenacity==8.3.0
 fastapi[all]
