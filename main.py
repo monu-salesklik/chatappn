@@ -72,7 +72,7 @@ def get_conversational_chain():
 
     return chain
 
-def get_conversational_chain(user_question):
+def get_conversational(user_question):
 
     prompt_template = """
     you are a expert in giving title to chat based on filename passed as question if you dont get any title just return chat with first two words of file name \n\n
@@ -130,5 +130,5 @@ async def create_item(query: Query):
 
 @app.post("/genratechattitle/") 
 async def create_item(query: Query):
-    r = get_conversational_chain(query.query)
+    r = get_conversational(query.query)
     return {"text":r}
