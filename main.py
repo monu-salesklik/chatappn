@@ -1,4 +1,3 @@
-import streamlit as st
 from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import os
@@ -8,7 +7,6 @@ from langchain_community.vectorstores import FAISS
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts import PromptTemplate
-from bokeh.models import CustomJS
 import io
 from dotenv import load_dotenv
 from fastapi import FastAPI , UploadFile
