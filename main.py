@@ -1,3 +1,4 @@
+import streamlit as st
 from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import os
@@ -7,10 +8,12 @@ from langchain_community.vectorstores import FAISS
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts import PromptTemplate
+from bokeh.models import CustomJS
 import io
 from dotenv import load_dotenv
 from fastapi import FastAPI , UploadFile
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 os.getenv("GOOGLE_API_KEY")
@@ -20,7 +23,15 @@ genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 app = FastAPI()
 
 
+origins = ["*"]
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def get_pdf_text(pdf_docs):
@@ -63,6 +74,21 @@ def get_conversational_chain():
 
     return chain
 
+def get_conversational_chain(user_question):
+
+    prompt_template = """
+    you are a expert in giving title to chat based on filename passed as question if you dont get any title just return chat with first two words of file name \n\n
+    Context:\n {context}?\n
+    Question: \n{question}\n
+
+    Answer:
+    """
+
+    model = ChatGoogleGenerativeAI(model="gemini-pro",temperature=0.3)
+
+    chain = model.invoke("genrate a chat title in 3 words only based on filename - "+user_question)
+    return chain.content
+
 
 
 def user_input(user_question):
@@ -102,4 +128,9 @@ async def create_upload_file(file: UploadFile):
 @app.post("/chat/") 
 async def create_item(query: Query):
     r = user_input(query.query)
-    return {"status":r}
+    return {"text":r}
+
+@app.post("/genratechattitle/") 
+async def create_item(query: Query):
+    r = get_conversational_chain(query.query)
+    return {"text":r}
