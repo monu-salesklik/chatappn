@@ -21,7 +21,7 @@ genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 app = FastAPI()
 
 
-origins = ["https://chatwithmepdf.onrender.com"]
+origins = ["https://chatwithmepdf.onrender.com","https://pdfsamvadapp.onrender.com/"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -48,10 +48,10 @@ def get_text_chunks(text):
     return chunks
 
 
-def get_vector_store(text_chunks):
+def get_vector_store(text_chunks,getfoldername):
     embeddings = GoogleGenerativeAIEmbeddings(model = "models/embedding-001")
     vector_store = FAISS.from_texts(text_chunks, embedding=embeddings)
-    vector_store.save_local("faiss_index")
+    vector_store.save_local("vector/"+getfoldername)
 
 
 def get_conversational_chain():
@@ -89,10 +89,10 @@ def get_conversational(user_question):
 
 
 
-def user_input(user_question):
+def user_input(user_question,uuid):
     embeddings = GoogleGenerativeAIEmbeddings(model = "models/embedding-001")
     
-    new_db = FAISS.load_local("faiss_index", embeddings,allow_dangerous_deserialization=True)
+    new_db = FAISS.load_local("vector/"+uuid, embeddings,allow_dangerous_deserialization=True)
     docs = new_db.similarity_search(user_question)
 
     chain = get_conversational_chain()
@@ -120,15 +120,19 @@ async def create_upload_file(file: UploadFile):
 
     raw_text = get_pdf_text([pdf_file])
     text_chunks = get_text_chunks(raw_text)
-    get_vector_store(text_chunks)
-    return {"status":raw_text}
+    get_vector_store(text_chunks,file.filename)
+    return {"status":file.filename}
 
 @app.post("/chat/") 
 async def create_item(query: Query):
-    r = user_input(query.query)
+    r = user_input(query.query,query.uuid)
     return {"text":r}
 
 @app.post("/genratechattitle/") 
 async def create_item(query: Query):
-    r = get_conversational(query.query)
+    r = user_input(query.query,query.uuid)
     return {"text":r}
+# @app.post("/genratechattitle/") 
+# async def create_item(query: Query):
+#     r = get_conversational(query.query)
+#     return {"text":r}
