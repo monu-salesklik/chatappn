@@ -21,7 +21,7 @@ genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 app = FastAPI()
 
 
-origins = ["https://chatwithmepdf.onrender.com","https://pdfsamvadapp.onrender.com/"]
+origins = ["https://chatwithmepdf.onrender.com","https://pdfsamvadapp.onrender.com"]
 
 app.add_middleware(
     CORSMiddleware,
